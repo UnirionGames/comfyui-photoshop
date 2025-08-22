@@ -64,9 +64,13 @@ async def save_file(data, filename):
     binary = base64.b64decode(data)
     path = os.path.join(ps_inputs_directory, filename)
 
-    # Always re-encode through Pillow to guarantee a real PNG on disk
-    with Image.open(BytesIO(binary)) as image:
-        image.save(path, format="PNG")
+    # If the incoming data is JPEG, re-encode it as PNG; otherwise write bytes directly
+    if binary[:2] == b"\xff\xd8":
+        with Image.open(BytesIO(binary)) as image:
+            image.save(path, format="PNG")
+    else:
+        with open(path, "wb") as file:
+            file.write(binary)
 
 
 async def save_config(data):
