@@ -5,8 +5,6 @@ import sys
 import uuid
 import json
 import base64
-from io import BytesIO
-from PIL import Image
 from aiohttp import web, WSMsgType
 import folder_paths
 from server import PromptServer
@@ -64,14 +62,9 @@ async def save_file(data, filename):
     binary = base64.b64decode(data)
     path = os.path.join(ps_inputs_directory, filename)
 
-    # Always re-encode using Pillow to ensure a lossless PNG is written
-    try:
-        with Image.open(BytesIO(binary)) as image:
-            image.save(path, format="PNG")
-    except Exception:
-        # Fallback to writing raw bytes if decoding fails
-        with open(path, "wb") as file:
-            file.write(binary)
+    # Write the raw bytes directly to preserve the original encoding
+    with open(path, "wb") as file:
+        file.write(binary)
 
 
 async def save_config(data):

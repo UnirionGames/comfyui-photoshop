@@ -524,7 +524,7 @@ function Ge(i, e = le) {
 }
 const vo = "/assets/defaultImg-BcFEYa9o.jpg",
   { app: he, core: Vt } = require("photoshop"),
-  { localFileSystem: Gi } = require("uxp").storage,
+  { localFileSystem: Gi, formats: Qv } = require("uxp").storage,
   Ss = require("uxp").storage.localFileSystem,
   vr = require("photoshop").imaging,
   { batchPlay: _t } = require("photoshop").action;
@@ -8936,17 +8936,18 @@ const La = (i = { left: 0, top: 0, right: 0, bottom: 0 }) => {
     return ((ji = t), { sourceBounds: t, targetSize: { width: s, height: r } });
   },
   Mp = (i, e) => ({ newWidth: i, newHeight: e }),
-  Ea = async (i) => {
+  Ea = async () => {
     try {
-      // Request raw pixel data without forcing a mimeType to avoid Photoshop's lossy JPEG preview
-      // encoding. We'll explicitly encode to PNG ourselves to guarantee lossless output.
-      const t = await vr.getPixels(i),
-        n = await vr.encodeImageData({
-          imageData: t.imageData,
-          format: "png",
-          base64: !0,
-        });
-      return (t.imageData.dispose(), "data:image/png;base64," + n);
+      const t = await Gi.getTemporaryFolder(),
+        n = await t.createFile("ps_export.png", { overwrite: !0 });
+      await he.activeDocument.saveAs.png(n, {
+        embedColorProfile: !0,
+        compression: 0,
+      });
+      const s = await n.read({ format: Qv.binary }),
+        r = Buffer.from(s).toString("base64");
+      await n.delete();
+      return "data:image/png;base64," + r;
     } catch (t) {
       throw (ne.error("❌ Error saving image:", t), t);
     }
@@ -9029,18 +9030,9 @@ const La = (i = { left: 0, top: 0, right: 0, bottom: 0 }) => {
   },
   xp = async () => {
     try {
-      const { sourceBounds: i, targetSize: e } = await Ia();
+      await Ia();
       return await Vt.executeAsModal(async () => {
-        const t = {
-            documentID: he.activeDocument.id,
-            targetSize: e,
-            componentSize: 16,
-            applyAlpha: !0,
-            colorProfile: "sRGB IEC61966-2.1",
-            colorSpace: "RGB",
-            ...(i && { sourceBounds: i }),
-          },
-          n = await Ea(t);
+        const n = await Ea();
         return (Xt.set(!1), ne.info("📸 Image saved as base64 PNG"), n);
       });
     } catch (i) {
