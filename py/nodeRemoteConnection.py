@@ -56,8 +56,27 @@ class PhotoshopConnections:
 
     def SendImg(self, Selection_To_Mask):
         self.loadImg(self.ImgDir)
-        self.image = self.i.convert("RGB")
-        self.image = np.array(self.image).astype(np.float32) / 255.0
+        np_img = np.array(self.i)
+
+        if np_img.dtype == np.uint16:
+            if self.i.mode not in ("RGB", "RGBA"):
+                self.i = self.i.convert("RGB")
+                np_img = np.array(self.i, dtype=np.uint16)
+            if np_img.ndim == 2:
+                np_img = np.stack([np_img] * 3, axis=-1)
+            elif np_img.shape[2] > 3:
+                np_img = np_img[..., :3]
+            self.image = np_img.astype(np.float32) / 65535.0
+        else:
+            if self.i.mode not in ("RGB", "RGBA"):
+                self.i = self.i.convert("RGB")
+                np_img = np.array(self.i)
+            if np_img.ndim == 2:
+                np_img = np.stack([np_img] * 3, axis=-1)
+            elif np_img.shape[2] > 3:
+                np_img = np_img[..., :3]
+            self.image = np_img.astype(np.float32) / 255.0
+
         self.image = torch.from_numpy(self.image)[None,]
         self.width, self.height = self.i.size
 
@@ -94,6 +113,6 @@ class PhotoshopConnections:
                 return base64.b64encode(img_file.read()).decode("utf-8")
 
 
-NODE_CLASS_MAPPINGS = {"🔹 Photoshop RemoteConnection": PhotoshopConnections}
+NODE_CLASS_MAPPINGS = {" Photoshop RemoteConnection": PhotoshopConnections}
 
 NODE_DISPLAY_NAME_MAPPINGS = {"PhotoshopConnection": "🔹 Photoshop RemoteConnection"}
