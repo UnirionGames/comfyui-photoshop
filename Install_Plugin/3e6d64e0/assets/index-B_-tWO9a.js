@@ -8944,8 +8944,7 @@ const La = (i = { left: 0, top: 0, right: 0, bottom: 0 }) => {
         embedColorProfile: !0,
         compression: 0,
       });
-      const s = await n.read({ format: Qv.binary }),
-        r = Buffer.from(s).toString("base64");
+      const r = await n.read({ format: Qv.base64 });
       await n.delete();
       return "data:image/png;base64," + r;
     } catch (t) {
