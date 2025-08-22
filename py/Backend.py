@@ -58,8 +58,13 @@ def install_plugin():
 
 async def save_file(data, filename):
     data = base64.b64decode(data)
-    image = Image.open(BytesIO(data))
-    image.save(os.path.join(ps_inputs_directory, filename), format="PNG")
+    path = os.path.join(ps_inputs_directory, filename)
+    if data[:2] == b"\xff\xd8":
+        image = Image.open(BytesIO(data))
+        image.save(path, format="PNG")
+    else:
+        with open(path, "wb") as f:
+            f.write(data)
 
 
 async def save_config(data):
