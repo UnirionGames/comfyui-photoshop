@@ -5,6 +5,8 @@ import sys
 import uuid
 import json
 import base64
+from io import BytesIO
+from PIL import Image
 from aiohttp import web, WSMsgType
 import folder_paths
 from server import PromptServer
@@ -56,8 +58,8 @@ def install_plugin():
 
 async def save_file(data, filename):
     data = base64.b64decode(data)
-    with open(os.path.join(ps_inputs_directory, filename), "wb") as file:
-        file.write(data)
+    image = Image.open(BytesIO(data))
+    image.save(os.path.join(ps_inputs_directory, filename), format="PNG")
 
 
 async def save_config(data):
