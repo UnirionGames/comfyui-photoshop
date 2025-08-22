@@ -8938,7 +8938,9 @@ const La = (i = { left: 0, top: 0, right: 0, bottom: 0 }) => {
   Mp = (i, e) => ({ newWidth: i, newHeight: e }),
   Ea = async (i) => {
     try {
-      const t = await vr.getPixels({ ...i, mimeType: "image/png" }),
+      // Request raw pixel data without forcing a mimeType to avoid Photoshop's lossy JPEG preview
+      // encoding. We'll explicitly encode to PNG ourselves to guarantee lossless output.
+      const t = await vr.getPixels(i),
         n = await vr.encodeImageData({
           imageData: t.imageData,
           format: "png",
