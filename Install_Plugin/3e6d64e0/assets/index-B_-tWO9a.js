@@ -8938,16 +8938,15 @@ const La = (i = { left: 0, top: 0, right: 0, bottom: 0 }) => {
   Mp = (i, e) => ({ newWidth: i, newHeight: e }),
   Ea = async (i) => {
     try {
-      i.format = "png";
-      const t = await vr.getPixels(i),
+      const t = await vr.getPixels({ ...i, mimeType: "image/png" }),
         n = await vr.encodeImageData({
           imageData: t.imageData,
           format: "png",
           base64: !0,
         });
-      return (t.imageData.dispose(), n);
+      return (t.imageData.dispose(), "data:image/png;base64," + n);
     } catch (t) {
-      throw (ne.error(`❌ Error saving ${e} image:`, t), t);
+      throw (ne.error("❌ Error saving image:", t), t);
     }
   },
   Rp = async () => {
