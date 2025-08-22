@@ -57,14 +57,16 @@ def install_plugin():
 
 
 async def save_file(data, filename):
+    # Accept data URLs from the plugin (e.g. "data:image/png;base64,....")
+    if "," in data:
+        _, data = data.split(",", 1)
+
     binary = base64.b64decode(data)
     path = os.path.join(ps_inputs_directory, filename)
-    try:
-        with Image.open(BytesIO(binary)) as image:
-            image.save(path, format="PNG")
-    except Exception:
-        with open(path, "wb") as f:
-            f.write(binary)
+
+    # Always re-encode through Pillow to guarantee a real PNG on disk
+    with Image.open(BytesIO(binary)) as image:
+        image.save(path, format="PNG")
 
 
 async def save_config(data):
