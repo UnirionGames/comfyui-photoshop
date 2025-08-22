@@ -5,6 +5,7 @@ import tempfile
 import os
 import base64
 import subprocess
+import time
 
 
 class PhotoshopConnections:
@@ -42,14 +43,16 @@ class PhotoshopConnections:
         self.ImgDir = f"{self.TmpDir}/temp_image.png"
         self.MaskDir = f"{self.TmpDir}/temp_image_mask.png"
 
-        ImgScript = f"""var saveFile = new File("{self.ImgDir}"); var pngOptions = new PNGSaveOptions(); pngOptions.compression = 0; activeDocument.saveAs(saveFile, pngOptions, true);"""
+        ImgScript = f"""var saveFile = new File("{self.ImgDir}"); if(saveFile.exists) saveFile.remove(); var pngOptions = new PNGSaveOptions(); pngOptions.compression = 0; activeDocument.saveAs(saveFile, pngOptions, true);"""
 
-        Maskscript = f"""try{{var e=app.activeDocument,a=e.selection.bounds,t=e.activeHistoryState,i=e.artLayers.add(),s=new SolidColor,r=e.artLayers.add(),l=new SolidColor,c=new File("{self.MaskDir}"),n=new PNGSaveOptions;function o(){{s.rgb.hexValue="000000",l.rgb.hexValue="FFFFFF",e.activeLayer=r,e.selection.fill(l),e.activeLayer=i,e.selection.selectAll(),e.selection.fill(s),n.compression=0,e.saveAs(c,n,!0),e.activeHistoryState=t}}e.suspendHistory("Mask Applied","main()")}}catch(y){{File("{self.MaskDir}").remove()}}"""
+        Maskscript = f"""try{{var e=app.activeDocument,a=e.selection.bounds,t=e.activeHistoryState,i=e.artLayers.add(),s=new SolidColor,r=e.artLayers.add(),l=new SolidColor,c=new File("{self.MaskDir}"),n=new PNGSaveOptions;function o(){{s.rgb.hexValue="000000",l.rgb.hexValue="FFFFFF",e.activeLayer=r,e.selection.fill(l),e.activeLayer=i,e.selection.selectAll(),e.selection.fill(s),n.compression=0,c.exists&&c.remove(),e.saveAs(c,n,!0),e.activeHistoryState=t}}e.suspendHistory("Mask Applied","main()")}}catch(y){{File("{self.MaskDir}").remove()}}"""
 
         with PhotoshopConnection(password=password, host=Server, port=port) as ps_conn:
             ps_conn.execute(ImgScript)
+            self.wait_for_file(self.ImgDir)
             if Selection_To_Mask:
                 ps_conn.execute(Maskscript)
+                self.wait_for_file(self.MaskDir)
 
         self.SendImg(Selection_To_Mask)
         return (self.image, self.mask, self.width, self.height)
@@ -81,6 +84,13 @@ class PhotoshopConnections:
             self.i = Image.new(mode="RGB", size=(1, 1), color=(0, 0, 0))
         if not self.i:
             return
+
+    def wait_for_file(self, path, timeout=5):
+        start = time.time()
+        while time.time() - start < timeout:
+            if os.path.exists(path) and os.path.getsize(path) > 0:
+                return
+            time.sleep(0.05)
 
     @classmethod
     def IS_CHANGED(cls, ImgDir, MaskDir):
