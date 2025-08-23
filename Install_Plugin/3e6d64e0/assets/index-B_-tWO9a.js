@@ -8944,9 +8944,9 @@ const La = (i = { left: 0, top: 0, right: 0, bottom: 0 }) => {
         embedColorProfile: !0,
         compression: 0,
       });
-      const r = await n.read({ format: Qv.base64 });
+      const r = await n.read({ format: Qv.binary });
       await n.delete();
-      return "data:image/png;base64," + r;
+      return "data:image/png;base64," + pb(r);
     } catch (t) {
       throw (ne.error("❌ Error saving image:", t), t);
     }
@@ -9101,6 +9101,13 @@ const La = (i = { left: 0, top: 0, right: 0, bottom: 0 }) => {
     "Mask Sent to AI",
   ],
   Fp = { en_US: Np, Disabled_zh_CN: zp };
+function pb(i) {
+  let e = "",
+    t = new Uint8Array(i),
+    n = t.length;
+  for (let s = 0; s < n; s++) e += String.fromCharCode(t[s]);
+  return window.btoa(e);
+}
 function Bp(i) {
   const e = window.atob(i),
     t = e.length,
