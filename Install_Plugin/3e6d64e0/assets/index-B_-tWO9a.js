@@ -8940,10 +8940,14 @@ const La = (i = { left: 0, top: 0, right: 0, bottom: 0 }) => {
     try {
       const t = await Gi.getTemporaryFolder(),
         n = await t.createFile("ps_export.png", { overwrite: !0 });
-      await he.activeDocument.saveAs.png(n, {
-        embedColorProfile: !0,
-        compression: 0,
-      });
+      await vr.createRenditions([
+        {
+          input: he.activeDocument,
+          output: n,
+          type: "png",
+          scale: 1,
+        },
+      ]);
       const r = await n.read({ format: Qv.binary });
       await n.delete();
       return "data:image/png;base64," + pb(r);
