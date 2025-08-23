@@ -37,7 +37,7 @@ The frontend is a UXP-based Photoshop plugin. The source code is in the `js/` di
 
 *   **`js/main.js`**: The main entry point for the plugin.
 *   **`js/connection.js`**: Handles the WebSocket connection to the backend.
-*   **`Install_Plugin/3e6d64e0/assets/index-B_-tWO9a.js`**: This is the bundled and minified JavaScript file for the plugin. It's a Svelte application that has been processed by a bundler like Vite or Rollup. It contains all the UI components, application logic, and dependencies like GSAP. Due to minification, it is not human-readable.
+*   **`Install_Plugin/3e6d64e0/assets/index-B_-tWO9a.js`**: This is the main JavaScript file for the plugin. It is a bundled Svelte application that has been processed by a bundler like Vite or Rollup. It contains all the UI components, application logic, and dependencies like GSAP and i18next for internationalization. The code is not minified and is human-readable.
 *   **`Install_Plugin/3e6d64e0/assets/index-C3nL6Ca2.css`**: This file contains all the styles for the plugin. It uses CSS variables for theming and supports different color schemes.
 *   **`Install_Plugin/3e6d64e0/assets/defaultImg-BcFEYa9o.jpg`**: A default image asset used in the plugin's UI.
 

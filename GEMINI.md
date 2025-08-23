@@ -38,7 +38,7 @@ The plugin can be installed in two ways:
 
 The Photoshop plugin is built using modern web technologies. The core of the plugin is located in the `Install_Plugin/3e6d64e0/assets` directory.
 
-*   **`index-B_-tWO9a.js`**: This is the main JavaScript file for the plugin. It appears to be a bundled file created with a tool like Vite or Rollup, and it's written using the Svelte framework. It also includes the GSAP animation library. The file is minified, but it contains the entire frontend logic, including UI components, event handling, and communication with the backend.
+*   **`index-B_-tWO9a.js`**: This is the main JavaScript file for the plugin. It is a bundled Svelte application that has been processed by a bundler like Vite or Rollup. It contains all the UI components, application logic, and dependencies like GSAP and i18next for internationalization. The code is not minified and is human-readable.
 *   **`index-C3nL6Ca2.css`**: This file contains all the styles for the plugin's UI. It uses CSS variables for theming and defines styles for different color schemes (light, dark, etc.).
 *   **`defaultImg-BcFEYa9o.jpg`**: This is a default image used within the plugin.
 
