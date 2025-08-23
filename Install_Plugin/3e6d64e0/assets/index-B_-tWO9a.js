@@ -8936,16 +8936,7 @@ const La = (i = { left: 0, top: 0, right: 0, bottom: 0 }) => {
     const { newWidth: s, newHeight: r } = Mp(i, e);
     return ((ji = t), { sourceBounds: t, targetSize: { width: s, height: r } });
   },
-  Mp = (i, e) => {
-    const [t, n] = [Qe(bi), Qe(yi)].map((a) => parseInt(a, 10)),
-      s = i / e;
-    let r = Math.min(Math.max(i, n), t),
-      o = r / s;
-    return (
-      o > t ? ((o = t), (r = o * s)) : o < n && ((o = n), (r = o * s)),
-      { newWidth: r, newHeight: o }
-    );
-  },
+  Mp = (i, e) => ({ newWidth: i, newHeight: e }),
   Ea = async (i, e = "png") => {
     try {
       const t = await vr.getPixels(i),
@@ -9025,9 +9016,9 @@ const La = (i = { left: 0, top: 0, right: 0, bottom: 0 }) => {
             colorSpace: "RGB",
             ...(t && { sourceBounds: t }),
           };
-          ((i = await Ea(s, "jpg")),
+          ((i = await Ea(s, "png")),
             (he.activeDocument.activeHistoryState = e),
-            ne.info("📸 Mask saved as base64 JPG"));
+            ne.info("📸 Mask saved as base64 PNG"));
         }, "Mask Sent to AI"),
         is.set(!1),
         i
