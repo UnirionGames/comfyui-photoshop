@@ -5,7 +5,6 @@ import tempfile
 import os
 import base64
 import subprocess
-import time
 
 
 class PhotoshopConnections:
@@ -40,46 +39,25 @@ class PhotoshopConnections:
             )
 
         self.TmpDir = tempfile.gettempdir().replace("\\", "/")
-        self.ImgDir = f"{self.TmpDir}/temp_image.png"
-        self.MaskDir = f"{self.TmpDir}/temp_image_mask.png"
+        self.ImgDir = f"{self.TmpDir}/temp_image.jpg"
+        self.MaskDir = f"{self.TmpDir}/temp_image_mask.jpg"
 
-        ImgScript = f"""var saveFile = new File("{self.ImgDir}"); if(saveFile.exists) saveFile.remove(); var pngOptions = new PNGSaveOptions(); pngOptions.compression = 0; activeDocument.saveAs(saveFile, pngOptions, true);"""
+        ImgScript = f"""var saveFile = new File("{self.ImgDir}"); var jpegOptions = new JPEGSaveOptions(); jpegOptions.quality = 10; activeDocument.saveAs(saveFile, jpegOptions, true);"""
 
-        Maskscript = f"""try{{var e=app.activeDocument,a=e.selection.bounds,t=e.activeHistoryState,i=e.artLayers.add(),s=new SolidColor,r=e.artLayers.add(),l=new SolidColor,c=new File("{self.MaskDir}"),n=new PNGSaveOptions;function o(){{s.rgb.hexValue="000000",l.rgb.hexValue="FFFFFF",e.activeLayer=r,e.selection.fill(l),e.activeLayer=i,e.selection.selectAll(),e.selection.fill(s),n.compression=0,c.exists&&c.remove(),e.saveAs(c,n,!0),e.activeHistoryState=t}}e.suspendHistory("Mask Applied","main()")}}catch(y){{File("{self.MaskDir}").remove()}}"""
+        Maskscript = f"""try{{var e=app.activeDocument,a=e.selection.bounds,t=e.activeHistoryState,i=e.artLayers.add(),s=new SolidColor,r=e.artLayers.add(),l=new SolidColor,c=new File("{{self.MaskDir}}"),n=new JPEGSaveOptions;function o(){{s.rgb.hexValue="000000",l.rgb.hexValue="FFFFFF",e.activeLayer=r,e.selection.fill(l),e.activeLayer=i,e.selection.selectAll(),e.selection.fill(s),n.quality=1,e.saveAs(c,n,!0),e.activeHistoryState=t}}e.suspendHistory("Mask Applied","main()")}}catch(y){{File("{{self.MaskDir}}").remove()}}"""
 
         with PhotoshopConnection(password=password, host=Server, port=port) as ps_conn:
             ps_conn.execute(ImgScript)
-            self.wait_for_file(self.ImgDir)
             if Selection_To_Mask:
                 ps_conn.execute(Maskscript)
-                self.wait_for_file(self.MaskDir)
 
         self.SendImg(Selection_To_Mask)
         return (self.image, self.mask, self.width, self.height)
 
     def SendImg(self, Selection_To_Mask):
         self.loadImg(self.ImgDir)
-        np_img = np.array(self.i)
-
-        if np_img.dtype == np.uint16:
-            if self.i.mode not in ("RGB", "RGBA"):
-                self.i = self.i.convert("RGB")
-                np_img = np.array(self.i, dtype=np.uint16)
-            if np_img.ndim == 2:
-                np_img = np.stack([np_img] * 3, axis=-1)
-            elif np_img.shape[2] > 3:
-                np_img = np_img[..., :3]
-            self.image = np_img.astype(np.float32) / 65535.0
-        else:
-            if self.i.mode not in ("RGB", "RGBA"):
-                self.i = self.i.convert("RGB")
-                np_img = np.array(self.i)
-            if np_img.ndim == 2:
-                np_img = np.stack([np_img] * 3, axis=-1)
-            elif np_img.shape[2] > 3:
-                np_img = np_img[..., :3]
-            self.image = np_img.astype(np.float32) / 255.0
-
+        self.image = self.i.convert("RGB")
+        self.image = np.array(self.image).astype(np.float32) / 255.0
         self.image = torch.from_numpy(self.image)[None,]
         self.width, self.height = self.i.size
 
@@ -104,13 +82,6 @@ class PhotoshopConnections:
         if not self.i:
             return
 
-    def wait_for_file(self, path, timeout=5):
-        start = time.time()
-        while time.time() - start < timeout:
-            if os.path.exists(path) and os.path.getsize(path) > 0:
-                return
-            time.sleep(0.05)
-
     @classmethod
     def IS_CHANGED(cls, ImgDir, MaskDir):
         with open(ImgDir, "rb") as img_file:
@@ -123,6 +94,6 @@ class PhotoshopConnections:
                 return base64.b64encode(img_file.read()).decode("utf-8")
 
 
-NODE_CLASS_MAPPINGS = {" Photoshop RemoteConnection": PhotoshopConnections}
+NODE_CLASS_MAPPINGS = {"🔹 Photoshop RemoteConnection": PhotoshopConnections}
 
 NODE_DISPLAY_NAME_MAPPINGS = {"PhotoshopConnection": "🔹 Photoshop RemoteConnection"}

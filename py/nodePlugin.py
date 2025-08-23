@@ -100,24 +100,19 @@ class PhotoshopToComfyUI:
 
     def SendImg(self):
         self.loadImg(self.canvasDir)
-        canvas_16bit = "16" in self.i.mode
-        if canvas_16bit:
-            self.canvas = np.array(self.i).astype(np.float32) / 65535.0
-        else:
-            self.canvas = np.array(self.i.convert("RGB")).astype(np.float32) / 255.0
+        self.canvas = self.i.convert("RGB")
+        self.canvas = np.array(self.canvas).astype(np.float32) / 255.0
         self.canvas = torch.from_numpy(self.canvas)[None,]
         self.width, self.height = self.i.size
 
         self.loadImg(self.maskImgDir)
         self.i = ImageOps.exif_transpose(self.i)
-        mask_16bit = "16" in self.i.mode
-        mask_scale = 65535.0 if mask_16bit else 255.0
-        self.mask = np.array(self.i.getchannel("B")).astype(np.float32) / mask_scale
+        self.mask = np.array(self.i.getchannel("B")).astype(np.float32) / 255.0
         self.mask = torch.from_numpy(self.mask)
 
         # Convert #010101 to #000000
         self.mask = self.mask.numpy()  # Convert to numpy array for easier manipulation
-        target_color = 1 / mask_scale  # The float representation of #010101
+        target_color = 1 / 255.0  # The float representation of #010101
         self.mask[self.mask == target_color] = 0.0  # Change target_color to 0.0
         self.mask = torch.from_numpy(self.mask)
 
