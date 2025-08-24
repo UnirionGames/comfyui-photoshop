@@ -8942,8 +8942,8 @@ const La = (i = { left: 0, top: 0, right: 0, bottom: 0 }) => {
       const t = await vr.getPixels(i),
         n = await vr.encodeImageData({
           imageData: t.imageData,
-          format: e,
-          quality: e === "jpg" ? 1 : void 0,
+          format: e.toUpperCase(),
+          quality: e.toLowerCase() === "jpg" ? 1 : void 0,
           base64: !0,
         });
       return (t.imageData.dispose(), n);

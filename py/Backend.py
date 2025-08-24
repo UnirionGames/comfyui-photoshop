@@ -5,6 +5,8 @@ import sys
 import uuid
 import json
 import base64
+from io import BytesIO
+from PIL import Image
 from aiohttp import web, WSMsgType
 import folder_paths
 from server import PromptServer
@@ -55,9 +57,19 @@ def install_plugin():
 
 
 async def save_file(data, filename):
-    data = base64.b64decode(data)
+    if data.startswith("data:"):
+        data = data.split(",", 1)[-1]
+    decoded = base64.b64decode(data)
+    if decoded[:2] == b"\xff\xd8":
+        try:
+            with Image.open(BytesIO(decoded)) as img:
+                buffer = BytesIO()
+                img.save(buffer, format="PNG")
+                decoded = buffer.getvalue()
+        except Exception as e:
+            print(f"# PS: JPEG->PNG conversion error: {e}")
     with open(os.path.join(ps_inputs_directory, filename), "wb") as file:
-        file.write(data)
+        file.write(decoded)
 
 
 async def save_config(data):
