@@ -9208,7 +9208,10 @@ function Hp(i, e, t) {
       }
     },
     b = async () => {
-      (ne.info("🖼️ Canvas Changed: "), Ve(Xt, (u = !0), u), v());
+      if (!f) return;
+      ne.info("🖼️ Canvas Changed: ");
+      Ve(Xt, (u = !0), u);
+      v();
     };
   function y() {
     (Ve(Dt, (r = BigInt(Math.round(Math.random() * 1e6)).toString()), r),
@@ -9217,10 +9220,11 @@ function Hp(i, e, t) {
       k());
   }
   const C = async () => {
-    (f && Ve(Xt, (u = !0), u),
-      ne.info("🎭 Mask Changed: "),
-      Ve(is, (d = !0), d),
-      v());
+    if (!f) return;
+    Ve(Xt, (u = !0), u);
+    ne.info("🎭 Mask Changed: ");
+    Ve(is, (d = !0), d);
+    v();
   };
   async function v() {
     await k();
