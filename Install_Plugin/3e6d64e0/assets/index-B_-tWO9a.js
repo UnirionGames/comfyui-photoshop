@@ -8939,11 +8939,12 @@ const La = (i = { left: 0, top: 0, right: 0, bottom: 0 }) => {
     try {
       if (e === "png") {
         const r = await Ss.getTemporaryFolder(),
-          o = await r.createFile("ps_temp.png", { overwrite: !0 });
+          o = await r.createFile(`ps_temp_${Date.now()}.png`, { overwrite: !0 });
         await Vt.executeAsModal(async () => {
-          await he.activeDocument.saveAs(o, { fileType: "png" });
+          await he.activeDocument.saveAs(o, { fileType: "png", asCopy: !0 });
         });
-        return await o.read({ format: require("uxp").storage.formats.base64 });
+        const t = await o.read({ format: require("uxp").storage.formats.base64 });
+        return await o.delete(), t;
       }
       const t = await vr.getPixels(i),
         s = { imageData: t.imageData, format: e.toUpperCase(), base64: !0 };
