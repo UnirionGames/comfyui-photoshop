@@ -8945,8 +8945,10 @@ const La = (i = { left: 0, top: 0, right: 0, bottom: 0 }) => {
               .slice(2)}.png`,
             { overwrite: !0 },
           );
+        const rDoc = he.activeDocument;
         await Vt.executeAsModal(async () => {
-          await he.activeDocument.saveAs(o, { fileType: "png", asCopy: !0 });
+          await rDoc.saveAs(o, { fileType: "png", asCopy: !0 });
+          he.activeDocument = rDoc;
         });
         const t = await o.read({ format: require("uxp").storage.formats.base64 });
         return await o.delete(), t;
