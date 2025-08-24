@@ -8935,33 +8935,43 @@ const La = (i = { left: 0, top: 0, right: 0, bottom: 0 }) => {
       (e = t.bottom - t.top));
     return ((ji = t), { sourceBounds: t });
   },
-  Ea = async (i, e = "png") => {
-    try {
-      if (e === "png") {
-        const r = await Ss.getTemporaryFolder(),
-          o = await r.createFile(
-            `ps_temp_${Date.now()}_${Math.random()
-              .toString(36)
-              .slice(2)}.png`,
-            { overwrite: !0 },
-          );
-        const rDoc = he.activeDocument;
-        await Vt.executeAsModal(async () => {
-          await rDoc.saveAs(o, { fileType: "png", asCopy: !0 });
-          he.activeDocument = rDoc;
-        });
-        const t = await o.read({ format: require("uxp").storage.formats.base64 });
-        return await o.delete(), t;
+    Ea = async (i, e = "png") => {
+      try {
+        if (e === "png")
+          try {
+            const r = await Ss.getTemporaryFolder(),
+              o = await r.createFile(
+                `ps_temp_${Date.now()}_${Math.random()
+                  .toString(36)
+                  .slice(2)}.png`,
+                { overwrite: !0 },
+              ),
+              rDoc = he.activeDocument;
+            await Vt.executeAsModal(async () => {
+              await rDoc.saveAs(o, { fileType: "png", asCopy: !0 }),
+                (he.activeDocument = rDoc);
+            });
+            const t = await o.read({ format: require("uxp").storage.formats.base64 });
+            return await o.delete(), t;
+          } catch (t) {
+            const r = await vr.getPixels(i),
+              s = { imageData: r.imageData, format: "PNG", base64: !0 },
+              n = await vr.encodeImageData(s);
+            return (
+              ne.warn("⚠️ PNG saveAs failed, using encodeImageData"),
+              r.imageData.dispose(),
+              n
+            );
+          }
+        const t = await vr.getPixels(i),
+          s = { imageData: t.imageData, format: e.toUpperCase(), base64: !0 };
+        e === "jpg" && (s.quality = 12);
+        const n = await vr.encodeImageData(s);
+        return (t.imageData.dispose(), n);
+      } catch (t) {
+        throw (ne.error(`❌ Error saving ${e} image:`, t), t);
       }
-      const t = await vr.getPixels(i),
-        s = { imageData: t.imageData, format: e.toUpperCase(), base64: !0 };
-      e === "jpg" && (s.quality = 12);
-      const n = await vr.encodeImageData(s);
-      return (t.imageData.dispose(), n);
-    } catch (t) {
-      throw (ne.error(`❌ Error saving ${e} image:`, t), t);
-    }
-  },
+    },
   Rp = async () => {
     try {
       let i = "";

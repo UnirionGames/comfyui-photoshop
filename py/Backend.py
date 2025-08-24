@@ -61,14 +61,13 @@ async def save_file(data, filename):
     if data.startswith("data:"):
         data = data.split(",", 1)[-1]
     decoded = base64.b64decode(data)
-    if decoded[:2] == b"\xff\xd8":
-        try:
-            with Image.open(BytesIO(decoded)) as img:
-                buffer = BytesIO()
-                img.save(buffer, format="PNG")
-                decoded = buffer.getvalue()
-        except Exception as e:
-            print(f"# PS: JPEG->PNG conversion error: {e}")
+    try:
+        with Image.open(BytesIO(decoded)) as img:
+            buffer = BytesIO()
+            img.save(buffer, format="PNG")
+            decoded = buffer.getvalue()
+    except Exception as e:
+        print(f"# PS: PNG re-encode error: {e}")
     file_path = os.path.join(ps_inputs_directory, filename)
     with open(file_path, "wb") as file:
         file.write(decoded)
