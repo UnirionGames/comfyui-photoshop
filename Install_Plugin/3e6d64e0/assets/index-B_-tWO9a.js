@@ -9211,27 +9211,16 @@ function Hp(i, e, t) {
       v());
   };
   async function v() {
-    p && (await k());
+    await k();
   }
   async function k() {
     let w = {};
     c &&
       (Ve(Dt, (r = BigInt(Math.round(Math.random() * 1e6)).toString()), r),
       Ve(Un, (l = !0), l));
-    if (u) {
-      w.canvasBase64 = await xp();
-    }
-    if (d) {
-      w.maskBase64 = await Rp();
-      var D, W;
-      f &&
-        (W = (D = he.activeDocument) == null ? void 0 : D.selection) != null &&
-        W.bounds &&
-        Ve(Xt, (u = !0), u);
-    }
-    if (l) {
-      w.configdata = await A();
-    }
+    w.canvasBase64 = await xp();
+    w.maskBase64 = await Rp();
+    w.configdata = await A();
     (w.queue = !0),
       ne.info("🚀 Sending Queue ~ combinedData:", w),
       await Lp(JSON.stringify(w));
