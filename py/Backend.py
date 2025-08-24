@@ -23,6 +23,7 @@ ps_inputs_directory = os.path.join(
     "data",
     "ps_inputs",
 )
+os.makedirs(ps_inputs_directory, exist_ok=True)
 
 clients = {}
 photoshop_users = []
@@ -68,8 +69,10 @@ async def save_file(data, filename):
                 decoded = buffer.getvalue()
         except Exception as e:
             print(f"# PS: JPEG->PNG conversion error: {e}")
-    with open(os.path.join(ps_inputs_directory, filename), "wb") as file:
+    file_path = os.path.join(ps_inputs_directory, filename)
+    with open(file_path, "wb") as file:
         file.write(decoded)
+    print(f"# PS: wrote {file_path}")
 
 
 async def save_config(data):
