@@ -8933,10 +8933,8 @@ const La = (i = { left: 0, top: 0, right: 0, bottom: 0 }) => {
       Number(Qe(Is)) > 0 && (t = La(t)),
       (i = t.right - t.left),
       (e = t.bottom - t.top));
-    const { newWidth: s, newHeight: r } = Mp(i, e);
-    return ((ji = t), { sourceBounds: t, targetSize: { width: s, height: r } });
+    return ((ji = t), { sourceBounds: t });
   },
-  Mp = (i, e) => ({ newWidth: i, newHeight: e }),
   Ea = async (i, e = "png") => {
     try {
       const t = await vr.getPixels(i),
@@ -8954,7 +8952,7 @@ const La = (i = { left: 0, top: 0, right: 0, bottom: 0 }) => {
       return (
         await he.activeDocument.suspendHistory(async () => {
           const e = he.activeDocument.activeHistoryState,
-            { sourceBounds: t, targetSize: n } = await Ia();
+            { sourceBounds: t } = await Ia();
           await Vt.executeAsModal(async () => {
             (await _t(
               [
@@ -9006,7 +9004,6 @@ const La = (i = { left: 0, top: 0, right: 0, bottom: 0 }) => {
           });
           const s = {
             documentID: he.activeDocument.id,
-            targetSize: n,
             componentSize: 8,
             applyAlpha: !0,
             colorProfile: "sRGB IEC61966-2.1",
@@ -9026,11 +9023,10 @@ const La = (i = { left: 0, top: 0, right: 0, bottom: 0 }) => {
   },
   xp = async () => {
     try {
-      const { sourceBounds: i, targetSize: e } = await Ia();
+      const { sourceBounds: i } = await Ia();
       return await Vt.executeAsModal(async () => {
         const t = {
             documentID: he.activeDocument.id,
-            targetSize: e,
             componentSize: 8,
             applyAlpha: !0,
             colorProfile: "sRGB IEC61966-2.1",
