@@ -8936,9 +8936,10 @@ const La = (i = { left: 0, top: 0, right: 0, bottom: 0 }) => {
       (e = t.bottom - t.top));
     return ((ji = t), { sourceBounds: t });
   },
-    Ea = async (i, e = "png") => {
+    Ea = async (i, e = "PNG") => {
+      e = e.toUpperCase();
       try {
-        if (e === "png")
+        if (e === "PNG")
           try {
             const r = await Ss.getTemporaryFolder(),
               o = await r.createFile(
@@ -8965,8 +8966,7 @@ const La = (i = { left: 0, top: 0, right: 0, bottom: 0 }) => {
             );
           }
         const t = await vr.getPixels(i),
-          s = { imageData: t.imageData, format: e.toUpperCase(), base64: !0 };
-        e === "jpg" && (s.quality = 12);
+          s = { imageData: t.imageData, format: e, base64: !0 };
         const n = await vr.encodeImageData(s);
         return (t.imageData.dispose(), n);
       } catch (t) {
@@ -9037,7 +9037,7 @@ const La = (i = { left: 0, top: 0, right: 0, bottom: 0 }) => {
             colorSpace: "RGB",
             ...(t && { sourceBounds: t }),
           };
-          ((i = await Ea(s, "png")),
+          ((i = await Ea(s, "PNG")),
             (he.activeDocument.activeHistoryState = e),
             ne.info("📸 Mask saved as base64 PNG"));
         }, "Mask Sent to AI"),
@@ -9060,7 +9060,7 @@ const La = (i = { left: 0, top: 0, right: 0, bottom: 0 }) => {
             colorSpace: "RGB",
             ...(i && { sourceBounds: i }),
           },
-          n = await Ea(t);
+          n = await Ea(t, "PNG");
         return (Xt.set(!1), ne.info("📸 Image saved as base64 PNG"), n);
       });
     } catch (i) {

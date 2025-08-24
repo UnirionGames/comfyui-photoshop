@@ -5,6 +5,7 @@ import tempfile
 import os
 import base64
 import subprocess
+import uuid
 
 
 class PhotoshopConnections:
@@ -39,12 +40,16 @@ class PhotoshopConnections:
             )
 
         self.TmpDir = tempfile.gettempdir().replace("\\", "/")
-        self.ImgDir = f"{self.TmpDir}/temp_image.png"
-        self.MaskDir = f"{self.TmpDir}/temp_image_mask.png"
+        self.ImgDir = f"{self.TmpDir}/ps_canvas_{uuid.uuid4().hex}.png"
+        self.MaskDir = f"{self.TmpDir}/ps_mask_{uuid.uuid4().hex}.png"
 
-        ImgScript = f"""var saveFile = new File("{self.ImgDir}"); var pngOptions = new PNGSaveOptions(); pngOptions.interlaced = false; activeDocument.saveAs(saveFile, pngOptions, true);"""
+        ImgScript = (
+            f"""var saveFile = new File("{self.ImgDir}"); var pngOptions = new PNGSaveOptions(); pngOptions.interlaced = false; pngOptions.compression = 0; activeDocument.saveAs(saveFile, pngOptions, true);"""
+        )
 
-        Maskscript = f"""try{{var e=app.activeDocument,a=e.selection.bounds,t=e.activeHistoryState,i=e.artLayers.add(),s=new SolidColor,r=e.artLayers.add(),l=new SolidColor,c=new File("{self.MaskDir}"),n=new PNGSaveOptions;function o(){{s.rgb.hexValue="000000",l.rgb.hexValue="FFFFFF",e.activeLayer=r,e.selection.fill(l),e.activeLayer=i,e.selection.selectAll(),e.selection.fill(s),e.saveAs(c,n,!0),e.activeHistoryState=t}}e.suspendHistory("Mask Applied","main()")}}catch(y){{File("{self.MaskDir}").remove()}}"""
+        Maskscript = (
+            f"""try{{var e=app.activeDocument,a=e.selection.bounds,t=e.activeHistoryState,i=e.artLayers.add(),s=new SolidColor,r=e.artLayers.add(),l=new SolidColor,c=new File("{self.MaskDir}"),n=new PNGSaveOptions;n.compression=0;function o(){{s.rgb.hexValue=\"000000\",l.rgb.hexValue=\"FFFFFF\",e.activeLayer=r,e.selection.fill(l),e.activeLayer=i,e.selection.selectAll(),e.selection.fill(s),e.saveAs(c,n,!0),e.activeHistoryState=t}}e.suspendHistory(\"Mask Applied\",\"main()\")}}catch(y){{File(\"{self.MaskDir}\").remove()}}"""
+        )
 
         with PhotoshopConnection(password=password, host=Server, port=port) as ps_conn:
             ps_conn.execute(ImgScript)
