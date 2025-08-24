@@ -3875,7 +3875,7 @@ const Co = Ee("imageMode", "cover"),
   wi = Ee("fixMaskEdge", !0, !0),
   $i = Ee("showNegativeInput", !1),
   Ln = Ee("NoAnim", !1),
-  on = Ee("cropToBounding", !1),
+  on = Ee("renderOnPSChanges", !1),
   Es = Ee("StaticPanel", !0),
   _s = Ee("DontHideController", !0),
   Ci = Ee("ForceResize", !1),
@@ -9244,6 +9244,7 @@ function Hp(i, e, t) {
   async function P() {
     [Dt, Nt, Tn, On].forEach((w) => {
       w.subscribe(async () => {
+        if (!f) return;
         (Un.set(!0), await v());
       });
     });
