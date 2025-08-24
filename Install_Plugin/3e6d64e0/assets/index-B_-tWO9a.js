@@ -8939,7 +8939,12 @@ const La = (i = { left: 0, top: 0, right: 0, bottom: 0 }) => {
     try {
       if (e === "png") {
         const r = await Ss.getTemporaryFolder(),
-          o = await r.createFile(`ps_temp_${Date.now()}.png`, { overwrite: !0 });
+          o = await r.createFile(
+            `ps_temp_${Date.now()}_${Math.random()
+              .toString(36)
+              .slice(2)}.png`,
+            { overwrite: !0 },
+          );
         await Vt.executeAsModal(async () => {
           await he.activeDocument.saveAs(o, { fileType: "png", asCopy: !0 });
         });
@@ -9213,35 +9218,23 @@ function Hp(i, e, t) {
     c &&
       (Ve(Dt, (r = BigInt(Math.round(Math.random() * 1e6)).toString()), r),
       Ve(Un, (l = !0), l));
-    const x = [];
-    (u &&
-      x.push(
-        xp().then((q) => {
-          w.canvasBase64 = q;
-        }),
-      ),
-      d &&
-        x.push(
-          Rp().then((q) => {
-            var D, W;
-            ((w.maskBase64 = q),
-              f &&
-                (W = (D = he.activeDocument) == null ? void 0 : D.selection) !=
-                  null &&
-                W.bounds &&
-                Ve(Xt, (u = !0), u));
-          }),
-        ),
-      l &&
-        x.push(
-          A().then((q) => {
-            w.configdata = q;
-          }),
-        ),
-      await Promise.all(x),
-      (w.queue = !0),
+    if (u) {
+      w.canvasBase64 = await xp();
+    }
+    if (d) {
+      w.maskBase64 = await Rp();
+      var D, W;
+      f &&
+        (W = (D = he.activeDocument) == null ? void 0 : D.selection) != null &&
+        W.bounds &&
+        Ve(Xt, (u = !0), u);
+    }
+    if (l) {
+      w.configdata = await A();
+    }
+    (w.queue = !0),
       ne.info("🚀 Sending Queue ~ combinedData:", w),
-      await Lp(JSON.stringify(w)));
+      await Lp(JSON.stringify(w));
   }
   async function P() {
     [Dt, Nt, Tn, On].forEach((w) => {
