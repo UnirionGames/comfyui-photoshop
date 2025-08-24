@@ -3875,7 +3875,8 @@ const Co = Ee("imageMode", "cover"),
   wi = Ee("fixMaskEdge", !0, !0),
   $i = Ee("showNegativeInput", !1),
   Ln = Ee("NoAnim", !1),
-  on = Ee("renderOnPSChanges", !1),
+  on = Ee("cropToBounding", !1),
+  psRenderStore = Ee("renderOnPSChanges", !1),
   Es = Ee("StaticPanel", !0),
   _s = Ee("DontHideController", !0),
   Ci = Ee("ForceResize", !1),
@@ -9161,14 +9162,15 @@ const Da = async () => {
 };
 function Hp(i, e, t) {
   let n, s, r, o, a, l, u, f, d, c, p;
-  (Y(i, rt, (w) => t(12, (n = w))),
+  psRenderStore.set(!1),
+    Y(i, rt, (w) => t(12, (n = w))),
     Y(i, Nt, (w) => t(13, (s = w))),
     Y(i, Dt, (w) => t(14, (r = w))),
     Y(i, Tn, (w) => t(15, (o = w))),
     Y(i, On, (w) => t(16, (a = w))),
     Y(i, Un, (w) => t(17, (l = w))),
     Y(i, Xt, (w) => t(18, (u = w))),
-    Y(i, on, (w) => t(19, (f = w))),
+    Y(i, psRenderStore, (w) => t(19, (f = w))),
     Y(i, is, (w) => t(20, (d = w))),
     Y(i, Pi, (w) => t(21, (c = w))),
     Y(i, ki, (w) => t(22, (p = w))));
@@ -9712,7 +9714,7 @@ function Jp(i, e, t) {
   }
   const _ = (S) => St(S, u.t("renderOnPSChanges"));
   function b(S) {
-    ((d = S), on.set(d));
+    ((d = S), psRenderStore.set(d));
   }
   const y = (S) => St(S, u.t("cropToSelectionArea"));
   function C(S) {
