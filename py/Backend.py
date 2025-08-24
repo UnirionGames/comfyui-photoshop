@@ -5,6 +5,8 @@ import sys
 import uuid
 import json
 import base64
+from io import BytesIO
+from PIL import Image
 from aiohttp import web, WSMsgType
 import folder_paths
 from server import PromptServer
@@ -21,6 +23,7 @@ ps_inputs_directory = os.path.join(
     "data",
     "ps_inputs",
 )
+os.makedirs(ps_inputs_directory, exist_ok=True)
 
 clients = {}
 photoshop_users = []
@@ -55,9 +58,20 @@ def install_plugin():
 
 
 async def save_file(data, filename):
-    data = base64.b64decode(data)
-    with open(os.path.join(ps_inputs_directory, filename), "wb") as file:
-        file.write(data)
+    if data.startswith("data:"):
+        data = data.split(",", 1)[-1]
+    decoded = base64.b64decode(data)
+    try:
+        with Image.open(BytesIO(decoded)) as img:
+            buffer = BytesIO()
+            img.save(buffer, format="PNG")
+            decoded = buffer.getvalue()
+    except Exception as e:
+        print(f"# PS: PNG re-encode error: {e}")
+    file_path = os.path.join(ps_inputs_directory, filename)
+    with open(file_path, "wb") as file:
+        file.write(decoded)
+    print(f"# PS: wrote {file_path}")
 
 
 async def save_config(data):

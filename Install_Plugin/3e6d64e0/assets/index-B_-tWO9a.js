@@ -3876,6 +3876,7 @@ const Co = Ee("imageMode", "cover"),
   $i = Ee("showNegativeInput", !1),
   Ln = Ee("NoAnim", !1),
   on = Ee("cropToBounding", !1),
+  psRenderStore = Ee("renderOnPSChanges", !1),
   Es = Ee("StaticPanel", !0),
   _s = Ee("DontHideController", !0),
   Ci = Ee("ForceResize", !1),
@@ -8933,40 +8934,52 @@ const La = (i = { left: 0, top: 0, right: 0, bottom: 0 }) => {
       Number(Qe(Is)) > 0 && (t = La(t)),
       (i = t.right - t.left),
       (e = t.bottom - t.top));
-    const { newWidth: s, newHeight: r } = Mp(i, e);
-    return ((ji = t), { sourceBounds: t, targetSize: { width: s, height: r } });
+    return ((ji = t), { sourceBounds: t });
   },
-  Mp = (i, e) => {
-    const [t, n] = [Qe(bi), Qe(yi)].map((a) => parseInt(a, 10)),
-      s = i / e;
-    let r = Math.min(Math.max(i, n), t),
-      o = r / s;
-    return (
-      o > t ? ((o = t), (r = o * s)) : o < n && ((o = n), (r = o * s)),
-      { newWidth: r, newHeight: o }
-    );
-  },
-  Ea = async (i, e = "png") => {
-    try {
-      const t = await vr.getPixels(i),
-        n = await vr.encodeImageData({
-          imageData: t.imageData,
-          format: e,
-          quality: e === "jpg" ? 1 : void 0,
-          base64: !0,
-        });
-      return (t.imageData.dispose(), n);
-    } catch (t) {
-      throw (ne.error(`❌ Error saving ${e} image:`, t), t);
-    }
-  },
+    Ea = async (i, e = "png") => {
+      try {
+        if (e === "png")
+          try {
+            const r = await Ss.getTemporaryFolder(),
+              o = await r.createFile(
+                `ps_temp_${Date.now()}_${Math.random()
+                  .toString(36)
+                  .slice(2)}.png`,
+                { overwrite: !0 },
+              ),
+              rDoc = he.activeDocument;
+            await Vt.executeAsModal(async () => {
+              await rDoc.saveAs(o, { fileType: "png", asCopy: !0 }),
+                (he.activeDocument = rDoc);
+            });
+            const t = await o.read({ format: require("uxp").storage.formats.base64 });
+            return await o.delete(), t;
+          } catch (t) {
+            const r = await vr.getPixels(i),
+              s = { imageData: r.imageData, format: "PNG", base64: !0 },
+              n = await vr.encodeImageData(s);
+            return (
+              ne.warn("⚠️ PNG saveAs failed, using encodeImageData"),
+              r.imageData.dispose(),
+              n
+            );
+          }
+        const t = await vr.getPixels(i),
+          s = { imageData: t.imageData, format: e.toUpperCase(), base64: !0 };
+        e === "jpg" && (s.quality = 12);
+        const n = await vr.encodeImageData(s);
+        return (t.imageData.dispose(), n);
+      } catch (t) {
+        throw (ne.error(`❌ Error saving ${e} image:`, t), t);
+      }
+    },
   Rp = async () => {
     try {
       let i = "";
       return (
         await he.activeDocument.suspendHistory(async () => {
           const e = he.activeDocument.activeHistoryState,
-            { sourceBounds: t, targetSize: n } = await Ia();
+            { sourceBounds: t } = await Ia();
           await Vt.executeAsModal(async () => {
             (await _t(
               [
@@ -9018,16 +9031,15 @@ const La = (i = { left: 0, top: 0, right: 0, bottom: 0 }) => {
           });
           const s = {
             documentID: he.activeDocument.id,
-            targetSize: n,
             componentSize: 8,
             applyAlpha: !0,
             colorProfile: "sRGB IEC61966-2.1",
             colorSpace: "RGB",
             ...(t && { sourceBounds: t }),
           };
-          ((i = await Ea(s, "jpg")),
+          ((i = await Ea(s, "png")),
             (he.activeDocument.activeHistoryState = e),
-            ne.info("📸 Mask saved as base64 JPG"));
+            ne.info("📸 Mask saved as base64 PNG"));
         }, "Mask Sent to AI"),
         is.set(!1),
         i
@@ -9038,11 +9050,10 @@ const La = (i = { left: 0, top: 0, right: 0, bottom: 0 }) => {
   },
   xp = async () => {
     try {
-      const { sourceBounds: i, targetSize: e } = await Ia();
+      const { sourceBounds: i } = await Ia();
       return await Vt.executeAsModal(async () => {
         const t = {
             documentID: he.activeDocument.id,
-            targetSize: e,
             componentSize: 8,
             applyAlpha: !0,
             colorProfile: "sRGB IEC61966-2.1",
@@ -9151,14 +9162,15 @@ const Da = async () => {
 };
 function Hp(i, e, t) {
   let n, s, r, o, a, l, u, f, d, c, p;
-  (Y(i, rt, (w) => t(12, (n = w))),
+  psRenderStore.set(!1),
+    Y(i, rt, (w) => t(12, (n = w))),
     Y(i, Nt, (w) => t(13, (s = w))),
     Y(i, Dt, (w) => t(14, (r = w))),
     Y(i, Tn, (w) => t(15, (o = w))),
     Y(i, On, (w) => t(16, (a = w))),
     Y(i, Un, (w) => t(17, (l = w))),
     Y(i, Xt, (w) => t(18, (u = w))),
-    Y(i, on, (w) => t(19, (f = w))),
+    Y(i, psRenderStore, (w) => t(19, (f = w))),
     Y(i, is, (w) => t(20, (d = w))),
     Y(i, Pi, (w) => t(21, (c = w))),
     Y(i, ki, (w) => t(22, (p = w))));
@@ -9198,61 +9210,44 @@ function Hp(i, e, t) {
       }
     },
     b = async () => {
-      (ne.info("🖼️ Canvas Changed: "), Ve(Xt, (u = !0), u), v());
+      if (!f) return;
+      ne.info("🖼️ Canvas Changed: ");
+      Ve(Xt, (u = !0), u);
+      v();
     };
   function y() {
     (Ve(Dt, (r = BigInt(Math.round(Math.random() * 1e6)).toString()), r),
       Ve(Un, (l = !0), l),
       ne.info("🎲 Random seed: ", r),
-      k());
+      k(!0));
   }
   const C = async () => {
-    (f && Ve(Xt, (u = !0), u),
-      ne.info("🎭 Mask Changed: "),
-      Ve(is, (d = !0), d),
-      v());
+    if (!f) return;
+    Ve(Xt, (u = !0), u);
+    ne.info("🎭 Mask Changed: ");
+    Ve(is, (d = !0), d);
+    v();
   };
   async function v() {
-    p && (await k());
+    await k();
   }
-  async function k() {
+  async function k(wt = !1) {
+    if (!wt && !f) return;
     let w = {};
     c &&
       (Ve(Dt, (r = BigInt(Math.round(Math.random() * 1e6)).toString()), r),
       Ve(Un, (l = !0), l));
-    const x = [];
-    (u &&
-      x.push(
-        xp().then((q) => {
-          w.canvasBase64 = q;
-        }),
-      ),
-      d &&
-        x.push(
-          Rp().then((q) => {
-            var D, W;
-            ((w.maskBase64 = q),
-              f &&
-                (W = (D = he.activeDocument) == null ? void 0 : D.selection) !=
-                  null &&
-                W.bounds &&
-                Ve(Xt, (u = !0), u));
-          }),
-        ),
-      l &&
-        x.push(
-          A().then((q) => {
-            w.configdata = q;
-          }),
-        ),
-      await Promise.all(x),
-      (w.queue = !0),
+    w.canvasBase64 = await xp();
+    w.maskBase64 = await Rp();
+    w.configdata = await A();
+    (w.queue = !0),
       ne.info("🚀 Sending Queue ~ combinedData:", w),
-      await Lp(JSON.stringify(w)));
+      await Lp(JSON.stringify(w));
   }
   async function P() {
     [Dt, Nt, Tn, On].forEach((w) => {
       w.subscribe(async () => {
+        if (!f) return;
         (Un.set(!0), await v());
       });
     });
@@ -9573,7 +9568,7 @@ function Yp(i) {
     })),
     b.$on("mouseenter", i[15]),
     b.$on("click", function () {
-      tt(i[2].SendQueue) && i[2].SendQueue.apply(this, arguments);
+      tt(i[2].SendQueue) && i[2].SendQueue.apply(this, [!0]);
     }),
     b.$on("contextmenu", function () {
       tt(i[2].randomize) && i[2].randomize.apply(this, arguments);
@@ -9719,7 +9714,7 @@ function Jp(i, e, t) {
   }
   const _ = (S) => St(S, u.t("renderOnPSChanges"));
   function b(S) {
-    ((d = S), on.set(d));
+    ((d = S), psRenderStore.set(d));
   }
   const y = (S) => St(S, u.t("cropToSelectionArea"));
   function C(S) {
@@ -14428,7 +14423,7 @@ function Um(i) {
       tt(i[1].randomize) && i[1].randomize.apply(this, arguments);
     }),
     y.$on("click", function () {
-      tt(i[1].SendQueue) && i[1].SendQueue.apply(this, arguments);
+      tt(i[1].SendQueue) && i[1].SendQueue.apply(this, [!0]);
     }),
     (v = new Le({
       props: {
