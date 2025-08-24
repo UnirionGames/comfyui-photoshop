@@ -8940,12 +8940,9 @@ const La = (i = { left: 0, top: 0, right: 0, bottom: 0 }) => {
   Ea = async (i, e = "png") => {
     try {
       const t = await vr.getPixels(i),
-        n = await vr.encodeImageData({
-          imageData: t.imageData,
-          format: e.toUpperCase(),
-          quality: e.toLowerCase() === "jpg" ? 1 : void 0,
-          base64: !0,
-        });
+        s = { imageData: t.imageData, format: e, base64: !0 };
+      e === "jpg" && (s.quality = 12);
+      const n = await vr.encodeImageData(s);
       return (t.imageData.dispose(), n);
     } catch (t) {
       throw (ne.error(`❌ Error saving ${e} image:`, t), t);
