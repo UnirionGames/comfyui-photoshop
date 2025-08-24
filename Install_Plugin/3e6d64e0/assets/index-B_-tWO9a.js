@@ -9217,7 +9217,7 @@ function Hp(i, e, t) {
     (Ve(Dt, (r = BigInt(Math.round(Math.random() * 1e6)).toString()), r),
       Ve(Un, (l = !0), l),
       ne.info("🎲 Random seed: ", r),
-      k());
+      k(!0));
   }
   const C = async () => {
     if (!f) return;
@@ -9229,7 +9229,8 @@ function Hp(i, e, t) {
   async function v() {
     await k();
   }
-  async function k() {
+  async function k(wt = !1) {
+    if (!wt && !f) return;
     let w = {};
     c &&
       (Ve(Dt, (r = BigInt(Math.round(Math.random() * 1e6)).toString()), r),
@@ -9565,7 +9566,7 @@ function Yp(i) {
     })),
     b.$on("mouseenter", i[15]),
     b.$on("click", function () {
-      tt(i[2].SendQueue) && i[2].SendQueue.apply(this, arguments);
+      tt(i[2].SendQueue) && i[2].SendQueue.apply(this, [!0]);
     }),
     b.$on("contextmenu", function () {
       tt(i[2].randomize) && i[2].randomize.apply(this, arguments);
@@ -14420,7 +14421,7 @@ function Um(i) {
       tt(i[1].randomize) && i[1].randomize.apply(this, arguments);
     }),
     y.$on("click", function () {
-      tt(i[1].SendQueue) && i[1].SendQueue.apply(this, arguments);
+      tt(i[1].SendQueue) && i[1].SendQueue.apply(this, [!0]);
     }),
     (v = new Le({
       props: {
